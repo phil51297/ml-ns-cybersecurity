@@ -7,12 +7,11 @@ import seaborn as sns
 import numpy as np
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.ensemble import IsolationForest
-import matplotlib.cm as cm
+
 
 visualization_dir = "visualizations"
 if not os.path.exists(visualization_dir):
