@@ -248,5 +248,125 @@ if csv_files:
     print(f"\nDétection d'anomalies terminée. Résultats sauvegardés dans le dossier '{results_dir}'.")
     print("\nAnalyse complète du dataset de cybersécurité terminée!")
     
+    print("\n\n--- INTERPRETATION AND SUMMARY ---")
+
+    report_dir = "reports"
+    if not os.path.exists(report_dir):
+        os.makedirs(report_dir)
+
+    cluster_summary = pd.DataFrame()
+
+    cluster_summary = df.groupby('Cluster').agg({
+        'Financial Loss (in Million $)': ['mean', 'min', 'max'],
+        'Number of Affected Users': ['mean', 'min', 'max'],
+        'Incident Resolution Time (in Hours)': ['mean', 'min', 'max'],
+        'Year': ['mean', 'min', 'max']
+    })
+
+    dominant_attack = {}
+    for cluster in df['Cluster'].unique():
+        attack_counts = df[df['Cluster'] == cluster]['Attack Type'].value_counts()
+        dominant_attack[cluster] = attack_counts.idxmax()
+
+    target_industries = {}
+    for cluster in df['Cluster'].unique():
+        industry_counts = df[df['Cluster'] == cluster]['Target Industry'].value_counts()
+        target_industries[cluster] = industry_counts.idxmax()
+
+    defense_mechanisms = {}
+    for cluster in df['Cluster'].unique():
+        defense_counts = df[df['Cluster'] == cluster]['Defense Mechanism Used'].value_counts()
+        defense_mechanisms[cluster] = defense_counts.idxmax()
+
+    with open(os.path.join(report_dir, 'cybersecurity_report.txt'), 'w') as f:
+        f.write("RAPPORT D'ANALYSE DES MENACES DE CYBERSÉCURITÉ\n")
+        f.write("===========================================\n\n")
+        
+        f.write("1. RÉSUMÉ DES CLUSTERS IDENTIFIÉS\n")
+        f.write("--------------------------------\n\n")
+        
+        for cluster in sorted(df['Cluster'].unique()):
+            cluster_size = len(df[df['Cluster'] == cluster])
+            f.write(f"CLUSTER {cluster} ({cluster_size} incidents, {cluster_size/len(df)*100:.1f}% des données)\n")
+            f.write(f"- Type d'attaque dominant: {dominant_attack[cluster]}\n")
+            f.write(f"- Industrie principale ciblée: {target_industries[cluster]}\n")
+            f.write(f"- Mécanisme de défense typique: {defense_mechanisms[cluster]}\n")
+            f.write(f"- Perte financière moyenne: {df[df['Cluster'] == cluster]['Financial Loss (in Million $)'].mean():.2f} millions $\n")
+            f.write(f"- Utilisateurs affectés en moyenne: {int(df[df['Cluster'] == cluster]['Number of Affected Users'].mean())}\n")
+            f.write(f"- Temps de résolution moyen: {int(df[df['Cluster'] == cluster]['Incident Resolution Time (in Hours)'].mean())} heures\n\n")
+        
+        f.write("2. ANALYSE DES ANOMALIES\n")
+        f.write("------------------------\n\n")
+        
+        anomaly_count = df['anomaly'].sum()
+        f.write(f"Nombre total d'anomalies détectées: {anomaly_count} ({anomaly_count/len(df)*100:.1f}% des incidents)\n\n")
+        
+        f.write("Top 5 des types d'attaques avec le plus d'anomalies:\n")
+        anomaly_by_attack_pct = df.groupby('Attack Type')['anomaly'].mean().sort_values(ascending=False) * 100
+        for attack_type, pct in anomaly_by_attack_pct.head(5).items():
+            f.write(f"- {attack_type}: {pct:.1f}% d'anomalies\n")
+        
+        f.write("\n3. TENDANCES TEMPORELLES\n")
+        f.write("------------------------\n\n")
+        
+        yearly_trends = df.groupby('Year').agg({
+            'Financial Loss (in Million $)': 'mean',
+            'Number of Affected Users': 'mean',
+            'Incident Resolution Time (in Hours)': 'mean'
+        }).round(2)
+        
+        f.write("Évolution des impacts par année:\n")
+        f.write(f"{yearly_trends.to_string()}\n\n")
+        
+        f.write("4. RECOMMANDATIONS\n")
+        f.write("------------------\n\n")
+        
+        f.write("Sur la base de cette analyse, voici les principales recommandations:\n\n")
+        
+        top_vulnerabilities = df.groupby('Security Vulnerability Type')['Financial Loss (in Million $)'].mean().sort_values(ascending=False).head(3)
+        f.write("Vulnérabilités prioritaires à corriger:\n")
+        for vuln, impact in top_vulnerabilities.items():
+            f.write(f"- {vuln} (Impact financier moyen: {impact:.2f} millions $)\n")
+        
+        f.write("\nMécanismes de défense les plus efficaces:\n")
+        defense_resolution = df.groupby('Defense Mechanism Used')['Incident Resolution Time (in Hours)'].mean().sort_values().head(3)
+        for defense, time in defense_resolution.items():
+            f.write(f"- {defense} (Temps de résolution moyen: {time:.1f} heures)\n")
+
+    print(f"Rapport d'analyse généré dans {os.path.join(report_dir, 'cybersecurity_report.txt')}")
+
+    plt.figure(figsize=(15, 12))
+
+    plt.subplot(2, 2, 1)
+    cluster_counts = df['Cluster'].value_counts().sort_index()
+    plt.pie(cluster_counts, labels=[f'Cluster {i}' for i in cluster_counts.index], 
+            autopct='%1.1f%%', startangle=90, colors=plt.cm.viridis(np.linspace(0, 1, len(cluster_counts))))
+    plt.title('Distribution des Clusters', fontsize=14)
+
+    plt.subplot(2, 2, 2)
+    financial_by_attack = df.groupby('Attack Type')['Financial Loss (in Million $)'].mean().sort_values(ascending=False).head(5)
+    financial_by_attack.plot(kind='bar')
+    plt.title('Impact Financier par Type d\'Attaque', fontsize=14)
+    plt.ylabel('Perte Moyenne (Millions $)')
+    plt.xticks(rotation=45, ha='right')
+
+    plt.subplot(2, 2, 3)
+    yearly_attacks = df.groupby('Year').size()
+    yearly_attacks.plot(kind='line', marker='o', linewidth=2)
+    plt.title('Évolution du Nombre d\'Incidents par Année', fontsize=14)
+    plt.xlabel('Année')
+    plt.ylabel('Nombre d\'Incidents')
+    plt.grid(True, alpha=0.3)
+
+    plt.subplot(2, 2, 4)
+    defense_time = df.groupby('Defense Mechanism Used')['Incident Resolution Time (in Hours)'].mean().sort_values().head(5)
+    defense_time.plot(kind='barh')
+    plt.title('Efficacité des Mécanismes de Défense', fontsize=14)
+    plt.xlabel('Temps de Résolution Moyen (Heures)')
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(report_dir, 'dashboard_summary.png'))
+    print(f"Tableau de bord récapitulatif généré dans {os.path.join(report_dir, 'dashboard_summary.png')}")
+    
 else:
     print("Aucun fichier CSV trouvé dans le dossier téléchargé.")

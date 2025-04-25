@@ -1,0 +1,81 @@
+RAPPORT D'ANALYSE DES MENACES DE CYBERSÉCURITÉ
+===========================================
+
+1. RÉSUMÉ DES CLUSTERS IDENTIFIÉS
+--------------------------------
+
+CLUSTER 0 (711 incidents, 23.7% des données)
+- Type d'attaque dominant: DDoS
+- Industrie principale ciblée: Education
+- Mécanisme de défense typique: Firewall
+- Perte financière moyenne: 24.50 millions $
+- Utilisateurs affectés en moyenne: 708333
+- Temps de résolution moyen: 36 heures
+
+CLUSTER 1 (743 incidents, 24.8% des données)
+- Type d'attaque dominant: SQL Injection
+- Industrie principale ciblée: IT
+- Mécanisme de défense typique: Antivirus
+- Perte financière moyenne: 70.50 millions $
+- Utilisateurs affectés en moyenne: 728980
+- Temps de résolution moyen: 34 heures
+
+CLUSTER 2 (774 incidents, 25.8% des données)
+- Type d'attaque dominant: Phishing
+- Industrie principale ciblée: Retail
+- Mécanisme de défense typique: VPN
+- Perte financière moyenne: 35.30 millions $
+- Utilisateurs affectés en moyenne: 269861
+- Temps de résolution moyen: 37 heures
+
+CLUSTER 3 (772 incidents, 25.7% des données)
+- Type d'attaque dominant: DDoS
+- Industrie principale ciblée: IT
+- Mécanisme de défense typique: Antivirus
+- Perte financière moyenne: 70.40 millions $
+- Utilisateurs affectés en moyenne: 336686
+- Temps de résolution moyen: 36 heures
+
+2. ANALYSE DES ANOMALIES
+------------------------
+
+Nombre total d'anomalies détectées: 150 (5.0% des incidents)
+
+Top 5 des types d'attaques avec le plus d'anomalies:
+- SQL Injection: 6.4% d'anomalies
+- Phishing: 5.7% d'anomalies
+- DDoS: 5.6% d'anomalies
+- Malware: 5.6% d'anomalies
+- Man-in-the-Middle: 3.7% d'anomalies
+
+3. TENDANCES TEMPORELLES
+------------------------
+
+Évolution des impacts par année:
+      Financial Loss (in Million $)  Number of Affected Users  Incident Resolution Time (in Hours)
+Year                                                                                              
+2015                          52.38                 510083.65                                38.43
+2016                          48.94                 505384.51                                35.92
+2017                          50.98                 507234.73                                35.39
+2018                          47.49                 489596.63                                36.98
+2019                          49.94                 495106.19                                35.31
+2020                          50.06                 504878.61                                36.44
+2021                          53.09                 519204.01                                36.17
+2022                          49.91                 513406.16                                37.20
+2023                          50.66                 489859.23                                36.95
+2024                          51.62                 511977.65                                35.93
+
+4. RECOMMANDATIONS
+------------------
+
+Sur la base de cette analyse, voici les principales recommandations:
+
+Vulnérabilités prioritaires à corriger:
+- Social Engineering (Impact financier moyen: 50.91 millions $)
+- Weak Passwords (Impact financier moyen: 50.52 millions $)
+- Zero-day (Impact financier moyen: 50.38 millions $)
+
+Mécanismes de défense les plus efficaces:
+- Firewall (Temps de résolution moyen: 35.7 heures)
+- Antivirus (Temps de résolution moyen: 36.6 heures)
+- Encryption (Temps de résolution moyen: 36.6 heures)
