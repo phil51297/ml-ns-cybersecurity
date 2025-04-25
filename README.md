@@ -34,8 +34,8 @@ The application uses the **Global Cybersecurity Threats 2015–2024** dataset fr
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/yourusername/cybersecurity-threats-analysis.git
-    cd cybersecurity-threats-analysis
+    git clone https://github.com/phil51297/ml-ns-cybersecurity.git
+    cd ml-ns-cybersecurity
     ```
 
 2. Create and activate a virtual environment (recommended):
