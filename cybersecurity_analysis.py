@@ -11,6 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
+from sklearn.ensemble import IsolationForest
 import matplotlib.cm as cm
 
 visualization_dir = "visualizations"
@@ -196,5 +197,56 @@ if csv_files:
     plt.savefig(os.path.join(visualization_dir, 'cluster_characteristics.png'))
 
     print("\nApprentissage non supervisé terminé. Tous les graphiques ont été sauvegardés.")
+    
+    print("\n\n--- ANOMALY DETECTION ---")
+    
+    anomaly_features = ['Financial Loss (in Million $)', 'Number of Affected Users', 'Incident Resolution Time (in Hours)']
+    X_anomaly = df[anomaly_features].values
+
+    scaler = StandardScaler()
+    X_anomaly_scaled = scaler.fit_transform(X_anomaly)
+
+    iso_forest = IsolationForest(contamination=0.05, random_state=42)
+    df['anomaly'] = iso_forest.fit_predict(X_anomaly_scaled)
+    df['anomaly'] = df['anomaly'].map({1: 0, -1: 1})
+
+    anomaly_count = df['anomaly'].sum()
+    print(f"Nombre d'anomalies détectées: {anomaly_count} ({(anomaly_count/len(df))*100:.2f}% des données)")
+
+    plt.figure(figsize=(12, 10))
+    plt.scatter(df[df['anomaly']==0]['Number of Affected Users'], 
+                df[df['anomaly']==0]['Financial Loss (in Million $)'],
+                alpha=0.6, c='blue', s=40, label='Normal')
+    plt.scatter(df[df['anomaly']==1]['Number of Affected Users'], 
+                df[df['anomaly']==1]['Financial Loss (in Million $)'],
+                alpha=1, c='red', s=120, edgecolors='black', label='Anomalie')
+    plt.title('Détection d\'Anomalies: Incidents de Cybersécurité', fontsize=16)
+    plt.xlabel('Nombre d\'Utilisateurs Affectés', fontsize=14)
+    plt.ylabel('Pertes Financières (en Millions $)', fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(visualization_dir, 'anomaly_detection.png'))
+
+    anomaly_by_attack = df.groupby('Attack Type')['anomaly'].mean().sort_values(ascending=False) * 100
+    plt.figure(figsize=(14, 8))
+    anomaly_by_attack.plot(kind='bar')
+    plt.title('Pourcentage d\'Anomalies par Type d\'Attaque', fontsize=16)
+    plt.xlabel('Type d\'Attaque', fontsize=14)
+    plt.ylabel('Pourcentage d\'Anomalies (%)', fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig(os.path.join(visualization_dir, 'anomaly_by_attack_type.png'))
+
+    results_dir = "results"
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    df.to_csv(os.path.join(results_dir, 'cybersecurity_analyzed.csv'), index=False)
+
+    print(f"\nDétection d'anomalies terminée. Résultats sauvegardés dans le dossier '{results_dir}'.")
+    print("\nAnalyse complète du dataset de cybersécurité terminée!")
+    
 else:
     print("Aucun fichier CSV trouvé dans le dossier téléchargé.")
